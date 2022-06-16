@@ -20,7 +20,7 @@
                         <form action="/updatedata/{{ $data->id }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Nama Penuh Saya</label>
+                                <label for="exampleInputEmail1" class="form-label">Nama Penuh Kamu</label>
                                 {{-- $data->name = variable $data tu kita recall dari EmployeeController, dan name pulak kita ambik dari column db --}}
                                 <input type="text" name="name" value="{{ $data->name }}" class="form-control"
                                     id="exampleInputEmail1" aria-describedby="emailHelp">
