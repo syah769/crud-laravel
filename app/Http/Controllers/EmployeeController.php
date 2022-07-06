@@ -4,14 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Exports\EmployeeExport;
+use App\Imports\EmployeeImport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
     //function for index
-    public function index()
+    public function index(Request $request)
     {
-        //apa yg aku fhm Employee:all() ni mcm kita fetch all data
-        $data = Employee::all(); //if nak display data, so kena import model Employee. Cer igt, model fungsinya to save database/data
+        if ($request->has('search')) {
+            $data = Employee::where('name', 'LIKE', '%' . $request->search . '%');
+        } else {
+            //apa yg aku fhm Employee:all() ni mcm kita fetch all data
+            //$data = Employee::all(); // -> if nak display data, so kena import model Employee. Cer igt, model fungsinya to save database/data
+            //dan utk yg terbaik supaya data tak loading berat, kita fetch based on pagination
+            $data = Employee::paginate(5); //-> dia akan display 5 yang utama dekat page depan. Sila refer datapegawai.blade.php, line 75. Related tau
+        }
+
         return view('datapegawai', compact('data'));
         //so, we return the datapegawai.blade.php because it's for View function and recall again the variable $data -> compact('data) hasil dari fetch all tu
         //variable $data akan dipanggil semula dekat View (datapegawai.blade.php. Sila rujuk )
@@ -68,4 +79,36 @@ class EmployeeController extends Controller
         $data->delete();
         return redirect('/pegawai')->with('success', 'Data Successfully Deleted');
     }
+
+    //function untuk export pdf
+    public function exportpdf()
+    {
+        //ia akan export semua data employee sebab kita dah ambil/fetch semua data
+        $data = Employee::all();
+        view()->share('data', $data);
+        $pdf = PDF::loadView('datapegawai-pdf');
+        return $pdf->download('listpegawai.pdf');
+    }
+
+    //export to excel
+    public function exportexcel()
+    {
+        //aku create new class iaitu EmployeeExport di mana class EmployeeExport ni basednya adalah model Employee
+        //return Excel ini adalah aku import library nya
+        return Excel::download(new EmployeeExport, 'datapegawai.xlsx');
+    }
+
+    public function importexcel(Request $request)
+    {
+        $data = $request->file('file'); //data akan request "benda" yang berupa file dengan name nya adalah file
+        $filename = $data->getClientOriginalName();
+        $data->move('PegawaiData', $filename);
+        Excel::import(new EmployeeImport, public_path('/PegawaiData/' . $filename));
+        return \redirect()->back();
+    }
 }
+
+/* nota:
+setiap method post yang kita tgk dari route (web.php), kita akan perasan dekat function dan method akan ada Request $request.
+Cer tgk kat atas nama method dari function masing2, dan tgk dkat web.php . Hg boleh tau guna method post or get
+*/

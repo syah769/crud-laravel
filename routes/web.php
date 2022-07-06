@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +16,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    //function ni untuk kira berapa org user, kalau dlm native kita guna SELECT COUNT(id) bagai, so dalam laravel lain sikit:
+    $jumlahpegawai = Employee::count();
+    $lelaki = Employee::where('gender', 'man')->count(); //if native, we code like SELECT COUNT bla3 WHERE gender = 'man' something like that la
+    $perempuan = Employee::where('gender', 'woman')->count(); //so... gender ni dari table db dan man/woman adalah value dalam column gender tu
+
+
+    // return view('welcome');
+    return view('welcome', compact('jumlahpegawai', 'lelaki', 'perempuan'));
+    //asalnya return view welcome je, tapi sebab kita nak return variable jumlahpegawai tu jugak, so tambahlah compact bla3 bagai
+    //variable jumlahpegawai akan direcall dekat welcome.blade.php line 26
 });
 
 //'index' tu adalah method yg dipetik dari EmployeeController. Cer bukak controller tu
@@ -35,3 +45,12 @@ Route::post('/updatedata/{pegawaiid}', [EmployeeController::class, 'updatedata']
 
 //route for delete data
 Route::get('/delete/{pegawaiid}', [EmployeeController::class, 'delete'])->name('delete');
+
+//route utk export to pdf file guna library DomPdf. Function exportpdf() di Employeecontroller, refer line 77
+Route::get('/exportpdf', [EmployeeController::class, 'exportpdf'])->name('exportpdf');
+
+//export excel
+Route::get('/exportexcel', [EmployeeController::class, 'exportexcel'])->name('exportexcel');
+
+//import excel
+Route::post('/importexcel', [EmployeeController::class, 'importexcel'])->name('importexcel');
