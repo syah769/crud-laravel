@@ -1,6 +1,7 @@
 @extends('layout.admin')
 
 @section('content')
+
     <body>
         <br>
         <h1 class="text-center mb-5 mt-5">Tambah Pegawai</h1>
@@ -17,6 +18,9 @@
                                     <label for="exampleInputEmail1" class="form-label">Full Name</label>
                                     <input type="text" name="name" class="form-control" id="exampleInputEmail1"
                                         aria-describedby="emailHelp">
+                                    @error('name')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label for="exampleInputEmail1" class="form-label">Gender</label>
@@ -30,6 +34,9 @@
                                     <label for="exampleInputEmail1" class="form-label">Phone No</label>
                                     <input type="number" name="phoneno" class="form-control" id="exampleInputEmail1"
                                         aria-describedby="emailHelp">
+                                    @error('phoneno')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label for="exampleInputEmail1" class="form-label">Photo</label>

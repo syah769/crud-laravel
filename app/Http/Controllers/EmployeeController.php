@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
@@ -16,11 +17,13 @@ class EmployeeController extends Controller
     {
         if ($request->has('search')) {
             $data = Employee::where('name', 'LIKE', '%' . $request->search . '%');
+            Session::put('halaman_url', request()->fullUrl());
         } else {
             //apa yg aku fhm Employee:all() ni mcm kita fetch all data
             //$data = Employee::all(); // -> if nak display data, so kena import model Employee. Cer igt, model fungsinya to save database/data
             //dan utk yg terbaik supaya data tak loading berat, kita fetch based on pagination
             $data = Employee::paginate(5); //-> dia akan display 5 yang utama dekat page depan. Sila refer datapegawai.blade.php, line 75. Related tau
+            Session::put('halaman_url', request()->fullUrl());
         }
 
         return view('datapegawai', compact('data'));
@@ -36,6 +39,16 @@ class EmployeeController extends Controller
     //fungsi Request adalah utk menangkap data yang dihantar dari form. Request ini digunakan utk penerimaan data dari input form
     public function insertdata(Request $request)
     {
+
+        //create valiation form based on video 22
+        //$this->validate($request) bermaksud kita nak buat validation tu based on variable request
+        //nak tampilkan error pulak, tgk tambahdata.blade.php line 21
+        $this->validate($request, [
+            'name' => 'required|min:7|max:20',
+            'phoneno' => 'required|min:11|max:12',
+        ]);
+
+
         //syntax to insert the data into db
         $data = Employee::create($request->all()); //request kesemua data dari form (full name, gender dan phone no)
 
@@ -64,6 +77,9 @@ class EmployeeController extends Controller
     {
         $data = Employee::find($pegawaiid);
         $data->update($request->all()); //kita request supaya semua data diupdate
+        if(session('halaman_url')) {
+            return redirect(session('halaman_url'))->with('success', 'Data successfully updated');
+        }
         if ($request->hasFile('photo')) {
             $request->file('photo')->move('photopegawai/', $request->file('photo')->getClientOriginalName());
             $data->photo = $request->file('photo')->getClientOriginalName();

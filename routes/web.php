@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\LoginController;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Route;
 
@@ -26,10 +27,10 @@ Route::get('/', function () {
     return view('welcome', compact('jumlahpegawai', 'lelaki', 'perempuan'));
     //asalnya return view welcome je, tapi sebab kita nak return variable jumlahpegawai tu jugak, so tambahlah compact bla3 bagai
     //variable jumlahpegawai akan direcall dekat welcome.blade.php line 26
-});
+})->middleware('auth');
 
 //'index' tu adalah method yg dipetik dari EmployeeController. Cer bukak controller tu
-Route::get('/pegawai', [EmployeeController::class, 'index'])->name('pegawai');
+Route::get('/pegawai', [EmployeeController::class, 'index'])->name('pegawai')->middleware('auth');
 
 Route::get('/tambahpegawai', [EmployeeController::class, 'tambahpegawai'])->name('tambahpegawai');
 
@@ -54,3 +55,18 @@ Route::get('/exportexcel', [EmployeeController::class, 'exportexcel'])->name('ex
 
 //import excel
 Route::post('/importexcel', [EmployeeController::class, 'importexcel'])->name('importexcel');
+
+//route for login page
+Route::get('/login', [LoginController::class, 'login'])->name('login');
+
+//route for login function
+Route::post('/loginuser', [LoginController::class, 'loginuser'])->name('loginuser');
+
+//route for register page
+Route::get('/register', [LoginController::class, 'register'])->name('register');
+
+//route for registration function
+Route::post('/registeruser', [LoginController::class, 'registeruser'])->name('registeruser');
+
+//route for logout
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');

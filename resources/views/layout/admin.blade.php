@@ -197,7 +197,9 @@
                             alt="User Image" />
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Alexander Pierce</a>
+                        {{-- to retrieve/akses the username selain id --}}
+                        {{-- read this https://stackoverflow.com/questions/17835886/laravel-authuser-id-trying-to-get-a-property-of-a-non-object --}}
+                        <a href="/" class="d-block">{{ Auth::user()->name }}</a>
                     </div>
                 </div>
 
@@ -263,6 +265,15 @@
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Data Pegawai
+                                    <span class="badge badge-info right"></span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Logout
                                     <span class="badge badge-info right"></span>
                                 </p>
                             </a>
